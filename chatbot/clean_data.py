@@ -4,7 +4,7 @@ from config import load_config
 config = load_config()
 CSV_INPUT_PATH = config["CSV_INPUT_PATH"]
 CSV_CLEANED_PATH = config["CSV_CLEANED_PATH"]
-N_ROWS = 2
+N_ROWS = 5000
 
 df = pd.read_csv(CSV_INPUT_PATH, encoding="utf-8", header=0, nrows=N_ROWS)
 df.fillna({

@@ -5,7 +5,8 @@ def load_config():
     load_dotenv()
     config = {
         "CSV_INPUT_PATH": os.path.join("../data", "gutenberg.csv"),
-        "CSV_CLEANED_PATH": os.path.join("../data", "gutenberg2.csv"),
+        "CSV_CLEANED_PATH": os.path.join("../data", "gutenberg_cleaned.csv"),
+        "CHROMA_PATH": "../model/chroma",
         "EMBEDDINGS_FILE": os.path.join("../model", "embeddings.csv"),
         "DOCS_FILE": os.path.join("../model", "docs.csv"),
         "FAISS_INDEX": os.path.join("../model", "faiss_index.index"),
