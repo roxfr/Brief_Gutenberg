@@ -43,8 +43,8 @@ def run_chat_loop(qa_chain, docs):
 def main():
     data = load_data(CSV_CLEANED_PATH)
     all_splits = split_documents(data, CHUNK_SIZE)    
+    embedding_model = EmbeddingModel().get_embedding_model()
     embeddings = load_embeddings(EMBEDDINGS_FILE)
-    embedding_model = EmbeddingModel().get_embedding_model() if not isinstance(embeddings, list) else embeddings    
     vectorstore = load_vector_store(embedding_model, FAISS_INDEX)
     if vectorstore is None:
         vectorstore = create_vector_store(all_splits, embedding_model, EMBEDDINGS_FILE, FAISS_INDEX, DOCS_FILE)
