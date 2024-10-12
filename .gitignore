@@ -1,16 +1,8 @@
-# Backup
-backup/
-
 # Model
 model/
 
 # Cache for Hugging Face
 .cache/
-
-# Node.js
-node_modules/
-npm-debug.log
-yarn-error.log
 
 # Python
 __pycache__/

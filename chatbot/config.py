@@ -6,7 +6,7 @@ def load_config():
     config = {
         "CSV_INPUT_PATH": os.path.join("../data", "gutenberg.csv"),
         "CSV_CLEANED_PATH": os.path.join("../data", "gutenberg_cleaned.csv"),
-        "CHROMA_PATH": "../model/chroma",
+        "CHROMA_PATH": os.path.join("../model", "chroma"),
         "EMBEDDINGS_FILE": os.path.join("../model", "embeddings.csv"),
         "DOCS_FILE": os.path.join("../model", "docs.csv"),
         "FAISS_INDEX": os.path.join("../model", "faiss_index.index"),
@@ -18,6 +18,7 @@ def load_config():
         "AZURE_API_VERSION": os.getenv("AZURE_API_VERSION"),
         "AZURE_DEPLOYMENT": os.getenv("AZURE_DEPLOYMENT"),
         "LANGCHAIN_ENDPOINT": os.getenv("LANGCHAIN_ENDPOINT"),
-        "LANGCHAIN_API_KEY": os.getenv("LANGCHAIN_API_KEY")
+        "LANGCHAIN_API_KEY": os.getenv("LANGCHAIN_API_KEY"),
+        "LLAMA_TOKEN": os.getenv("LLAMA_TOKEN")
     }
     return config
