@@ -16,7 +16,7 @@ def load_config():
         "AZURE_OPENAI_API_ENDPOINT": os.getenv("AZURE_OPENAI_API_ENDPOINT"),
         "AZURE_DEPLOYMENT_NAME": os.getenv("AZURE_DEPLOYMENT_NAME"),
         "AZURE_API_VERSION": os.getenv("AZURE_API_VERSION"),
-        "AZURE_DEPLOYEMENT": os.getenv("AZURE_DEPLOYEMENT"),
+        "AZURE_DEPLOYMENT": os.getenv("AZURE_DEPLOYMENT"),
         "LANGCHAIN_ENDPOINT": os.getenv("LANGCHAIN_ENDPOINT"),
         "LANGCHAIN_API_KEY": os.getenv("LANGCHAIN_API_KEY")
     }

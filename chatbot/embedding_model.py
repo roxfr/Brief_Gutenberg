@@ -4,7 +4,7 @@ from config import load_config
 config = load_config()
 AZURE_OPENAI_API_BASE = config["AZURE_OPENAI_API_BASE"]
 AZURE_OPENAI_API_KEY = config["AZURE_OPENAI_API_KEY"]
-AZURE_DEPLOYEMENT = config["AZURE_DEPLOYEMENT"]
+AZURE_DEPLOYMENT = config["AZURE_DEPLOYMENT"]
 CHUNK_SIZE = config["CHUNK_SIZE"]
 
 class EmbeddingModel:
@@ -12,7 +12,7 @@ class EmbeddingModel:
         self.embedding_model = AzureOpenAIEmbeddings(
             azure_endpoint=AZURE_OPENAI_API_BASE,
             openai_api_key=AZURE_OPENAI_API_KEY,
-            azure_deployment=AZURE_DEPLOYEMENT,
+            azure_deployment=AZURE_DEPLOYMENT,
             chunk_size=CHUNK_SIZE
         )
 

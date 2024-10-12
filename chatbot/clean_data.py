@@ -1,36 +1,63 @@
 import pandas as pd
-from config import load_config
+import nltk
+from nltk.tokenize import word_tokenize
+from nltk.stem import WordNetLemmatizer
+from nltk.corpus import stopwords
+import re
 
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+
+from config import load_config
 config = load_config()
 CSV_INPUT_PATH = config["CSV_INPUT_PATH"]
 CSV_CLEANED_PATH = config["CSV_CLEANED_PATH"]
 N_ROWS = 5000
 
-df = pd.read_csv(CSV_INPUT_PATH, encoding="utf-8", header=0, nrows=N_ROWS)
+text_columns = ['Author', 'Title', 'Summary', 'Subject']
+
+df = pd.read_csv(CSV_INPUT_PATH, encoding="utf-8-sig", header=0, nrows=N_ROWS, usecols=text_columns + ['EBook-No.', 'Release Date'])
+
 df.fillna({
-    'Author': 'Auteur non défini',
-    'Title': 'Titre non défini',
-    'Credits': 'Crédits non définis',
-    'Summary': 'Résumé non défini',
-    'Subject': 'Sujet non défini',
-    'EBook-No.': 'Numéro d\'ebook non défini',
-    'Release Date': 'Date de publication non définie'
+    'Author': 'Undefined Author',
+    'Title': 'Undefined Title',
+    'Summary': 'Undefined Summary',
+    'Subject': 'Undefined Subject',
+    'EBook-No.': 'Undefined eBook Number',
+    'Release Date': 'Undefined Release Date'
 }, inplace=True)
 
-text_columns = ['Author', 'Title', 'Summary', 'Subject', 'EBook-No.', 'Release Date']
-for col in text_columns:
-    df[col] = (
-        df[col]
-        .astype(str)
-        .str.replace(r'[^\x00-\x7F]+', '', regex=True)
-        .str.replace(r'[\n\r]', ' ', regex=True)
-        .str.strip()
+lemmatizer = WordNetLemmatizer()
+stop_words = set(stopwords.words('english'))
+
+def clean_text(text):
+    text = re.sub(r'[`“”\'‘’"()“”:;,.\n\r-]+', ' ', text)
+    text = re.sub(r'\'\'|``+', ' ', text) 
+    return ' '.join(text.split()).strip()
+
+def clean_and_tokenize(column):
+    cleaned = column.astype(str).apply(clean_text)
+    tokenized = cleaned.apply(word_tokenize)
+    return tokenized
+
+def lemmatize_tokens(tokenized_column):
+    return tokenized_column.apply(
+        lambda tokens: [
+            lemmatizer.lemmatize(token) for token in tokens if token.lower() not in stop_words
+        ]
     )
 
-df.drop(columns=['Ebook ID', 'Credits', 'Language', 'LoC Class', 
-                 'Subject_2', 'Subject_3', 'Subject_4', 'Category', 
-                 'Most Recently Updated', 'Copyright Status', 'Downloads'], 
-        inplace=True, errors='ignore')
+cleaned_dfs = {}
 
-df.dropna(how='all', inplace=True)
-df.to_csv(CSV_CLEANED_PATH, index=False, header=True, encoding='utf-8')
+for col in text_columns:
+    tokenized_column = clean_and_tokenize(df[col])
+    lemmatized_column = lemmatize_tokens(tokenized_column)
+    cleaned_dfs[col] = pd.DataFrame({col: lemmatized_column})
+
+cleaned_dfs['EBook-No.'] = df[['EBook-No.']]
+cleaned_dfs['Release Date'] = df[['Release Date']]
+
+final_df = pd.concat(cleaned_dfs.values(), axis=1)
+
+final_df.to_csv(CSV_CLEANED_PATH, index=False, header=True, encoding='utf-8-sig', sep=';')
