@@ -52,7 +52,7 @@ def get_existing_vector_store(persist_directory: str, collection_name: str):
         return None, False, client
 
 def create_vector_store(data: pd.DataFrame, batch_size: int = CHUNK_SIZE, 
-                        persist_directory: str = "path/to/directory", 
+                        persist_directory: str = CHROMA_PATH, 
                         collection_name: str = "project_gutenberg") -> Chroma:
     """Crée ou met à jour un magasin de vecteurs."""
     if data.empty or not all(col in data.columns for col in ['Title', 'Author', 'Summary', 'EBook-No.']):
@@ -104,7 +104,7 @@ tools = {
 #     Tu es un agent expert en littérature spécialisé dans les œuvres du projet Gutenberg. 
 #     Lorsque l'utilisateur pose une question : '{question}', 
 #     tu dois répondre uniquement avec des informations vérifiées issues de ces livres, 
-#     en utilisant le magasin de vecteurs à ta disposition.
+#     en utilisant le magasin de vecteurs à ta disposition {tools}.
 
 #     - Si tu ne sais pas la réponse, ne fais pas d'hypothèses ou d'inventions. 
 #     Réponds simplement par "Je ne sais pas." ou en donnant ce que tu sais avec précision.
@@ -115,8 +115,6 @@ tools = {
 #     Voici des exemples :
 #     - Bonne réponse : "L'auteur de L'Assommoir est Émile Zola."
 #     - Mauvaise réponse : "Je ne sais pas, mais cela pourrait être quelque chose comme John Doe." (Ne fais pas ça !)
-
-#     Outils disponibles : {tools}.
 # """
 
 template = """
@@ -124,7 +122,7 @@ template = """
             Lorsque l'utilisateur pose une question : '{question}', 
             répond uniquement avec des informations vérifiées issues de ces livres.
             Ne fais pas d'hypothèses. Si tu ne sais pas, dis "Je ne sais pas."
-            Fournis des réponses directes et factuelles.
+            Fournis des réponses directes, factuelles et en une seule phrase.
             Exemples :
             Bonne réponse : "L'auteur de L'Assommoir est Émile Zola."
             Mauvaise réponse : "Je ne sais pas, mais cela pourrait être quelque chose comme John Doe."
@@ -135,8 +133,8 @@ questions = [
         "Qui est l'auteur du livre L'Assommoir ?",
         "Quel sujet est traité dans House of Atreus ?",
         "Qui sont les personnages principaux dans Uninhabited House ?",
-        "Quels sont les titres des livress de l'auteur Dickens Charles ?",
-        "Peux-tu me donner le texte intégral de Blue Bird ?"
+        "Quels sont les titres des livres de l'auteur Dickens Charles ?",
+        "Peux-tu me récupérer le texte du livre Blue Bird sur internet ?"
 ]
 
 synonyms = {

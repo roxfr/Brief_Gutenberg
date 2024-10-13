@@ -10,3 +10,4 @@ langchain-core
 langchain-openai
 chromadb
 python-dotenv
+llama_cpp_python
