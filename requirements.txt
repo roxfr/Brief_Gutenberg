@@ -1,0 +1,12 @@
+pandas
+nltk
+requests
+beautifulsoup4
+tqdm
+sentence-transformers
+langchain
+langchain-community
+langchain-core
+langchain-openai
+chromadb
+python-dotenv
