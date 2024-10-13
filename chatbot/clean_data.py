@@ -1,6 +1,5 @@
 import pandas as pd
 import nltk
-from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 import re
@@ -31,28 +30,28 @@ df.fillna({
 lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words('english'))
 
+# def clean_text(text):
+#     text = re.sub(r'[`“”\'‘’"()“”:;,.\n\r-]+', ' ', text)
+#     text = re.sub(r'\'\'|``+', ' ', text) 
+#     return ' '.join(text.split()).strip()
+
 def clean_text(text):
-    text = re.sub(r'[`“”\'‘’"()“”:;,.\n\r-]+', ' ', text)
-    text = re.sub(r'\'\'|``+', ' ', text) 
+    text = re.sub(r'[`“”()“”:;,\n\r]+', ' ', text)
+    text = re.sub(r'\'\'|``+', ' ', text)
     return ' '.join(text.split()).strip()
 
-def clean_and_tokenize(column):
-    cleaned = column.astype(str).apply(clean_text)
-    tokenized = cleaned.apply(word_tokenize)
-    return tokenized
-
-def lemmatize_tokens(tokenized_column):
-    return tokenized_column.apply(
-        lambda tokens: [
-            lemmatizer.lemmatize(token) for token in tokens if token.lower() not in stop_words
-        ]
-    )
+def lemmatize_text(text):
+    words = text.split()
+    lemmatized = [
+        lemmatizer.lemmatize(word) for word in words if word.lower() not in stop_words
+    ]
+    return ' '.join(lemmatized)
 
 cleaned_dfs = {}
 
 for col in text_columns:
-    tokenized_column = clean_and_tokenize(df[col])
-    lemmatized_column = lemmatize_tokens(tokenized_column)
+    cleaned_column = df[col].astype(str).apply(clean_text)
+    lemmatized_column = cleaned_column.apply(lemmatize_text)
     cleaned_dfs[col] = pd.DataFrame({col: lemmatized_column})
 
 cleaned_dfs['EBook-No.'] = df[['EBook-No.']]
