@@ -2,7 +2,6 @@ import os
 import logging
 import pandas as pd
 from tqdm import tqdm
-from typing import Tuple
 # Langchain
 #from langchain.llms import LlamaCpp
 from langchain_community.llms import LlamaCpp
@@ -101,23 +100,35 @@ tools = {
     "get_full_text_from_url": "Fonction pour récupérer le texte intégral ou complet d'un livre",
 }
 
-template = """
-    Tu es un agent expert en littérature spécialisé dans les œuvres du projet Gutenberg. 
-    Lorsque l'utilisateur pose une question : '{question}', 
-    tu dois répondre uniquement avec des informations vérifiées issues de ces livres, 
-    en utilisant le magasin de vecteurs à ta disposition.
+# template = """
+#     Tu es un agent expert en littérature spécialisé dans les œuvres du projet Gutenberg. 
+#     Lorsque l'utilisateur pose une question : '{question}', 
+#     tu dois répondre uniquement avec des informations vérifiées issues de ces livres, 
+#     en utilisant le magasin de vecteurs à ta disposition.
 
-    - Si tu ne sais pas la réponse, ne fais pas d'hypothèses ou d'inventions. 
-    Réponds simplement par "Je ne sais pas." ou en donnant ce que tu sais avec précision.
-    - Fournis des réponses directes et factuelles. 
-    Par exemple, si la question concerne l'auteur, donne uniquement le nom de l'auteur. 
-    Si c'est sur le sujet, donne un résumé court.
+#     - Si tu ne sais pas la réponse, ne fais pas d'hypothèses ou d'inventions. 
+#     Réponds simplement par "Je ne sais pas." ou en donnant ce que tu sais avec précision.
+#     - Fournis des réponses directes et factuelles. 
+#     Par exemple, si la question concerne l'auteur, donne uniquement le nom de l'auteur. 
+#     Si c'est sur le sujet, donne un résumé court.
     
-    Voici des exemples :
-    - Bonne réponse : "L'auteur de L'Assommoir est Émile Zola."
-    - Mauvaise réponse : "Je ne sais pas, mais cela pourrait être quelque chose comme John Doe." (Ne fais pas ça !)
+#     Voici des exemples :
+#     - Bonne réponse : "L'auteur de L'Assommoir est Émile Zola."
+#     - Mauvaise réponse : "Je ne sais pas, mais cela pourrait être quelque chose comme John Doe." (Ne fais pas ça !)
 
-    Outils disponibles : {tools}.
+#     Outils disponibles : {tools}.
+# """
+
+template = """
+            Tu es un agent expert en littérature spécialisé dans les œuvres du projet Gutenberg.
+            Lorsque l'utilisateur pose une question : '{question}', 
+            répond uniquement avec des informations vérifiées issues de ces livres.
+            Ne fais pas d'hypothèses. Si tu ne sais pas, dis "Je ne sais pas."
+            Fournis des réponses directes et factuelles.
+            Exemples :
+            Bonne réponse : "L'auteur de L'Assommoir est Émile Zola."
+            Mauvaise réponse : "Je ne sais pas, mais cela pourrait être quelque chose comme John Doe."
+            Outils disponibles : {tools}.
 """
 
 questions = [

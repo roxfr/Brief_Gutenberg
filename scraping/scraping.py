@@ -1,6 +1,6 @@
 import os
-import requests  
-from bs4 import BeautifulSoup  
+import requests
+from bs4 import BeautifulSoup
 import csv
 
 # Chemin du fichier
@@ -12,10 +12,10 @@ if os.path.isfile(file_path):
 else:
     print("Le fichier 'gutenberg.csv' n'existe pas.")
 
-# Nombre total de pages à scraper  
+# Nombre total de pages à scraper
 total = 5000
 
-# Définir les en-têtes souhaitées  
+# Définir les en-têtes souhaitées
 headers = [
     "Author",
     "Title",
@@ -33,7 +33,7 @@ headers = [
     "Downloads"
 ]
 
-# Liste pour stocker les données  
+# Liste pour stocker les données
 data_list = []
 
 for ebook_id in range(total):
@@ -50,7 +50,7 @@ for ebook_id in range(total):
     # Trouver le tableau "about"
     about_table = soup.find('table', class_='bibrec')
 
-    # Initialiser un dictionnaire avec des valeurs vides  
+    # Initialiser un dictionnaire avec des valeurs vides
     data = {header: "" for header in headers}
 
     if about_table is None:
@@ -62,7 +62,7 @@ for ebook_id in range(total):
             if th and td:
                 field = th.text.strip()
                 value = td.text.strip()
-                # Mettre à jour le dictionnaire si le champ est dans les en-têtes  
+                # Mettre à jour le dictionnaire si le champ est dans les en-têtes
                 if field in data:
                     data[field] = value
         
@@ -70,7 +70,7 @@ for ebook_id in range(total):
         data_list.append((ebook_id, [data[header] for header in headers]))
         print(f"Données extraites pour l'ID {ebook_id}.")
 
-# Trier les données par ebook_id  
+# Trier les données par ebook_id
 data_list.sort(key=lambda x: x[0])
 
 # Ouvrir un fichier TSV pour écrire (tab-separated values)
@@ -80,7 +80,7 @@ with open(r'.\datas\gutenberg.csv', 'w', newline='', encoding='utf-8') as csvfil
     # Écrire les en-têtes  
     csv_writer.writerow(headers)
 
-    # Écrire les valeurs triées pour chaque page  
+    # Écrire les valeurs triées pour chaque page
     for ebook_id, values in data_list:
         csv_writer.writerow(values)
 
