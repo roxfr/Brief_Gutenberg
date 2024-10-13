@@ -1,5 +1,5 @@
 # Model
-model/
+models/
 
 # Cache for Hugging Face
 .cache/
