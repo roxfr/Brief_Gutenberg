@@ -65,7 +65,7 @@ def create_vector_store(data: pd.DataFrame, batch_size: int = CHUNK_SIZE,
         logging.info("Ajout ou mise à jour des textes dans le magasin de vecteurs...")
         for i in tqdm(range(0, len(data), batch_size), desc="Traitement des lots"):
             batch_data = data.iloc[i:i + batch_size]
-            metadata = [{'author': row['Author'], 'ebook_no': str(row['EBook-No.'])} for _, row in batch_data.iterrows()]       
+            metadata = [{'title': row['Title'], 'author': row['Author'], 'ebook_no': str(row['EBook-No.'])} for _, row in batch_data.iterrows()]       
             unique_ids = [str(uuid.uuid4()) for _ in range(len(batch_data))]
             collection.add(ids=unique_ids, documents=batch_data['Summary'].tolist(), metadatas=metadata)
         logging.info(f"{len(data)} textes ajoutés ou mis à jour dans le magasin de vecteurs.")
