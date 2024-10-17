@@ -1,11 +1,13 @@
 # Data
-data/*
-!data/gutenberg_cleaned.csv
-!data/gutenberg.csv
+data/chroma_langchain_db
+data/gutenberg.csv
 
 # Models
-models/*
-!models/llama_cpp_python-0.3.1-cp310-cp310-win_amd64.whl
+models/llama-2-13b-chat.Q5_K_M.gguf
+models/llama-2-13b-chat.Q6_K.gguf
+models/llama-2-13b-chat.Q8_0.gguf
+models/llama-2-13b-chat.Q5_K_M.gguf
+models/llama-3.2-8B-Instruct-agent-003-128k-code-DPO.Q8_0.gguf
 
 # Cache for Hugging Face
 .cache/
