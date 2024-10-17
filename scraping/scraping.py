@@ -4,10 +4,12 @@ from bs4 import BeautifulSoup
 import csv
 
 # Chemin du fichier
-file_path = r'.\datas\gutenberg.csv'
+from ..chatbot.config import load_config
+config = load_config()
+CSV_INPUT_PATH = config["CSV_INPUT_PATH"]
 
 # Vérifier si le fichier existe
-if os.path.isfile(file_path):
+if os.path.isfile(CSV_INPUT_PATH):
     print("Le fichier 'gutenberg.csv' existe.")
 else:
     print("Le fichier 'gutenberg.csv' n'existe pas.")
@@ -74,7 +76,7 @@ for ebook_id in range(total):
 data_list.sort(key=lambda x: x[0])
 
 # Ouvrir un fichier TSV pour écrire (tab-separated values)
-with open(r'.\datas\gutenberg.csv', 'w', newline='', encoding='utf-8') as csvfile:
+with open(CSV_INPUT_PATH, 'w', newline='', encoding='utf-8') as csvfile:
     csv_writer = csv.writer(csvfile, delimiter=',')
     
     # Écrire les en-têtes  

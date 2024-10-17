@@ -6,12 +6,8 @@ def load_config():
     config = {
         "CSV_INPUT_PATH": os.path.join("../data", "gutenberg.csv"),
         "CSV_CLEANED_PATH": os.path.join("../data", "gutenberg_cleaned.csv"),
-        "CHROMA_PATH": os.path.join("../models", "chroma_langchain_db"),
-        "EMBEDDINGS_FILE": os.path.join("../models", "embeddings.csv"),
-        "DOCS_FILE": os.path.join("../models", "docs.csv"),
-        "FAISS_INDEX": os.path.join("../models", "faiss_index.index"),
+        "CHROMA_PATH": os.path.join("../data", "chroma_langchain_db"),
         "CHAT_MODEL": os.path.join("../models", "llama-3.2-8B-Instruct-agent-003-128k-code-DPO.Q8_0.gguf"),
-        "CHUNK_SIZE": int(100),
         "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY"),
         "AZURE_OPENAI_API_BASE": os.getenv("AZURE_OPENAI_API_BASE"), 
         "AZURE_OPENAI_API_ENDPOINT": os.getenv("AZURE_OPENAI_API_ENDPOINT"),

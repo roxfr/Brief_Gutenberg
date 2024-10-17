@@ -1,5 +1,11 @@
-# Model
-models/
+# Data
+data/*
+!data/gutenberg_cleaned.csv
+!data/gutenberg.csv
+
+# Models
+models/*
+!models/llama_cpp_python-0.3.1-cp310-cp310-win_amd64.whl
 
 # Cache for Hugging Face
 .cache/
@@ -26,6 +32,7 @@ Thumbs.db
 # Configuration
 .env
 *.log
+gutenberg/
 
 # Build
 dist/

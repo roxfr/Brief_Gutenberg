@@ -2,17 +2,16 @@ import logging
 import requests
 import pandas as pd
 import time
-# Chroma
 from langchain_chroma import Chroma
 
 
 def find_in_dataframe(title: str, data: pd.DataFrame, column_name: str) -> str:
-    """Recherche une valeur dans le DataFrame par titre."""
+    """Recherche une valeur dans le DataFrame par titre"""
     row = data[data['Title'].str.contains(title, case=False)]
     return row.iloc[0][column_name] if not row.empty else None
 
 def get_author(vector_store: Chroma, title: str) -> str:
-    """Recherche l'auteur d'un livre par son titre."""
+    """Recherche l'auteur d'un livre par son titre"""
     logging.info(f"Recherche de l'auteur pour : {title}")
     start_time = time.time()
     try:
@@ -27,7 +26,7 @@ def get_author(vector_store: Chroma, title: str) -> str:
     return None
 
 def get_subject(vector_store: Chroma, title: str) -> str:
-    """Retourne le sujet d'un livre par son titre."""
+    """Retourne le sujet d'un livre par son titre"""
     logging.info(f"Recherche du sujet pour : {title}")
     start_time = time.time()
     try:
@@ -42,7 +41,7 @@ def get_subject(vector_store: Chroma, title: str) -> str:
     return None
 
 def get_characters(vector_store: Chroma, title: str) -> list:
-    """Extrait les personnages d'un livre par son titre."""
+    """Extrait les personnages d'un livre par son titre"""
     logging.info(f"Recherche du/des personnage(s) pour : {title}")
     start_time = time.time()
     try:
@@ -58,7 +57,7 @@ def get_characters(vector_store: Chroma, title: str) -> list:
     return None
 
 def fetch_text_from_url(ebook_no: str) -> str:
-    """Récupère le texte d'un livre à partir de son numéro d'ebook."""
+    """Récupère le texte d'un livre à partir de son numéro d'ebook"""
     url = f"https://www.gutenberg.org/files/{ebook_no}/{ebook_no}-0.txt"
     try:
         response = requests.get(url)
@@ -70,7 +69,7 @@ def fetch_text_from_url(ebook_no: str) -> str:
         return None
 
 def get_full_text_from_url(vector_store: Chroma, title: str) -> str:
-    """Récupère le texte complet d'un livre en ligne par son titre."""
+    """Récupère le texte complet d'un livre en ligne par son titre"""
     logging.info(f"Recherche du texte en ligne pour : {title}")
     start_time = time.time()
     try:
