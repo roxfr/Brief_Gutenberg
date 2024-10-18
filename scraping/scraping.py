@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import csv
 
 # Chemin du fichier
-from ..chatbot.config import load_config
+from ..utils.config import load_config
 config = load_config()
 CSV_INPUT_PATH = config["CSV_INPUT_PATH"]
 
