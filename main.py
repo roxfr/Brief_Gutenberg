@@ -1,125 +1,62 @@
+# uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+# http://localhost:8000/docs
 import logging
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
-from utils.tools import get_author, get_subject, get_characters, get_full_text_from_url
-from chatbot import load_books_data, download_book, extract_characters, answer_questions, initialize
+from utils.tools import load_csv
+from models.model import create_llama, create_vector_store
+from utils.config import load_config
+from utils.qa_chain import setup_qa_chain
+from utils.tools import find_in_dataframe, get_author, get_subject, get_characters, get_full_text_from_url
 
+# Configuration du logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+config = load_config()
+CSV_CLEANED_PATH = config["CSV_CLEANED_PATH"]
+CHROMA_PATH = config["CHROMA_PATH"]
+MODEL_PATH = config["MODEL_PATH"]
+
 app = FastAPI()
 
-data = load_books_data()
-retriever, embeddings = initialize()
+# Modèle LLM et vector store
+llm = create_llama(MODEL_PATH)
+vector_store = create_vector_store(load_csv(CSV_CLEANED_PATH), CHROMA_PATH)
+qa_chain = setup_qa_chain(llm, vector_store)
 
-@app.get("/characters/{book_id}")
-def get_characters_api(book_id: int):
-    """Récupère les personnages d'un livre donné par son ID."""
+@app.post("/ask/")
+def ask_question(question: str):
+    """Route pour poser une question au LLM"""
     try:
-        book_text = download_book(book_id)
-        characters = extract_characters(book_text)
-        return {"characters": characters}
+        tools = {
+            "find_in_dataframe": find_in_dataframe,
+            "get_author": get_author,
+            "get_subject": get_subject,
+            "get_characters": get_characters,
+            "get_full_text_from_url": get_full_text_from_url
+        }
+        response = qa_chain.invoke({"question": question, "tools": tools})
+        if response:
+            return {"response": response}
+        return {"response": "Je ne sais pas."}
     except Exception as e:
-        logger.error(f"Erreur lors de la récupération des personnages: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération des personnages.")
-
-@app.get("/text/{book_id}")
-def get_text(book_id: int, num_lines: int = 10):
-    """Récupère les premières lignes d'un livre donné par son ID."""
-    try:
-        book_text = download_book(book_id)
-        lines = "\n".join(book_text.splitlines()[:num_lines])
-        return {"book_id": book_id, "lines": lines}
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération du texte: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération du texte.")
-
-@app.post("/question/")
-def answer_question(question: str):
-    """Répond à une question basée sur les résumés des livres."""
-    try:
-        response = retriever.run(question)
-        return {"response": response}
-    except Exception as e:
-        logger.error(f"Erreur lors de la réponse à la question: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la réponse à la question.")
-
-@app.post("/full_text_question/")
-def answer_full_text_question(book_id: int, question: str):
-    """Répond à une question basée sur le texte complet d'un livre."""
-    try:
-        book_text = download_book(book_id)
-        response = answer_questions(book_text, question)
-        return {"response": response}
-    except Exception as e:
-        logger.error(f"Erreur lors de la réponse à la question sur le texte complet: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la réponse à la question.")
-
-@app.get("/author/{title}")
-def get_author_api(title: str):
-    """Récupère l'auteur d'un livre par son titre."""
-    try:
-        author = get_author(embeddings, title)
-        return {"title": title, "author": author}
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération de l'auteur: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération de l'auteur.")
-
-@app.get("/subject/{title}")
-def get_subject_api(title: str):
-    """Récupère le sujet d'un livre par son titre."""
-    try:
-        subject = get_subject(embeddings, title)
-        return {"title": title, "subject": subject}
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération du sujet: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération du sujet.")
-
-@app.get("/characters_by_title/{title}")
-def get_characters_by_title(title: str):
-    """Récupère les personnages d'un livre par son titre."""
-    try:
-        characters = get_characters(embeddings, title)
-        return {"title": title, "characters": characters}
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération des personnages par titre: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération des personnages par titre.")
-
-@app.get("/full_text/{title}")
-def get_full_text(title: str):
-    """Récupère le texte complet d'un livre par son titre."""
-    try:
-        full_text = get_full_text_from_url(embeddings, title)
-        return {"title": title, "full_text": full_text}
-    except Exception as e:
-        logger.error(f"Erreur lors de la récupération du texte complet: {e}")
-        raise HTTPException(status_code=500, detail="Erreur lors de la récupération du texte complet.")
+        logger.error(f"Erreur lors de la réponse à la question : {e}")
+        raise HTTPException(status_code=500, detail="Erreur interne du serveur")
 
 @app.get("/test")
 def test_route():
-    """Route de test pour vérifier le bon fonctionnement du serveur."""
-    return {"message": "Le serveur fonctionne correctement."}
-
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
-    """Gérer les exceptions HTTP."""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"message": exc.detail}
-    )
+    """Route de test pour vérifier le bon fonctionnement du serveur"""
+    return {"message": "Le serveur fonctionne correctement"}
 
 @app.exception_handler(Exception)
-async def generic_exception_handler(request, exc):
-    """Gérer les exceptions générales."""
-    logger.error(f"Une erreur s'est produite: {exc}")
+async def generic_exception_handler(exc):
+    """Gérer les exceptions générales"""
+    logger.error(f"Une erreur s'est produite : {exc}")
     return JSONResponse(
         status_code=500,
-        content={"message": "Une erreur interne s'est produite."}
+        content={"message": "Une erreur interne s'est produite"}
     )
-
-@app.get("/404")
-async def not_found_route():
-    raise HTTPException(status_code=404, detail="Page non trouvée.")
 
 if __name__ == "__main__":
     import uvicorn

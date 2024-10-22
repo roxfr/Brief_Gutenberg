@@ -1,9 +1,50 @@
+import os
 import logging
 import requests
 import pandas as pd
 import time
 from langchain_chroma import Chroma
 
+
+def load_csv(file_path: str) -> pd.DataFrame:
+    """Charge le fichier CSV et retourne un DataFrame"""
+    if not os.path.exists(file_path):
+        logging.error(f"Le fichier CSV n'existe pas : {file_path}")
+        raise FileNotFoundError(f"Le fichier CSV n'existe pas : {file_path}")
+    
+    try:
+        df = pd.read_csv(file_path, sep=';')
+        logging.info(f"Fichier CSV chargé : {file_path}")
+        return df
+    except pd.errors.EmptyDataError:
+        logging.error("Le fichier CSV est vide")
+        raise
+    except pd.errors.ParserError as e:
+        logging.error(f"Erreur de parsing du fichier CSV : {e}")
+        raise
+    except Exception as e:
+        logging.error(f"Erreur lors du chargement du fichier CSV : {e}")
+        raise
+
+synonyms = {
+    "auteur": ["auteur", "écrivain", "compositeur", "rédacteur"],
+    "sujet": ["sujet", "thème", "sujet principal", "question", "objet"],
+    "personnages": ["personnages", "protagonistes", "acteurs"],
+    "texte": ["texte complet", "texte intégral", "document complet"]
+}
+
+def process_question(question: str, vector_store) -> str:
+    """Identifie la question et retourne la réponse appropriée"""
+    question_lower = question.lower()
+    if any(syn in question_lower for syn in synonyms["auteur"]):
+        return get_author(vector_store, question)
+    elif any(syn in question_lower for syn in synonyms["sujet"]):
+        return get_subject(vector_store, question)
+    elif any(syn in question_lower for syn in synonyms["personnages"]):
+        return get_characters(vector_store, question)
+    elif any(syn in question_lower for syn in synonyms["texte"]):
+        return get_full_text_from_url(vector_store, question)
+    return None
 
 def find_in_dataframe(title: str, data: pd.DataFrame, column_name: str) -> str:
     """Recherche une valeur dans le DataFrame par titre"""
@@ -56,7 +97,7 @@ def get_characters(vector_store: Chroma, title: str) -> list:
         logging.error(f"Erreur lors de la recherche dans le vector store : {e}")
     return None
 
-def fetch_text_from_url(ebook_no: str) -> str:
+def get_text_from_url(ebook_no: str) -> str:
     """Récupère le texte d'un livre à partir de son numéro d'ebook"""
     url = f"https://www.gutenberg.org/files/{ebook_no}/{ebook_no}-0.txt"
     try:
@@ -79,7 +120,7 @@ def get_full_text_from_url(vector_store: Chroma, title: str) -> str:
         if results:
             ebook_no = results[0].metadata.get('ebook_no')
             if ebook_no:
-                return fetch_text_from_url(ebook_no)
+                return get_text_from_url(ebook_no)
     except Exception as e:
         logging.error(f"Erreur lors de la recherche dans le vector store : {e}")
     return None
