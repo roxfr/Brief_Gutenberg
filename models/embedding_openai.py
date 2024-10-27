@@ -1,6 +1,7 @@
 from langchain_openai.embeddings import AzureOpenAIEmbeddings
 from utils.config import load_config
 
+
 config = load_config()
 AZURE_OPENAI_API_BASE = config["AZURE_OPENAI_API_BASE"]
 AZURE_OPENAI_API_KEY = config["AZURE_OPENAI_API_KEY"]
@@ -8,7 +9,7 @@ AZURE_DEPLOYMENT = config["AZURE_DEPLOYMENT"]
 CHUNK_SIZE = config["CHUNK_SIZE"]
 
 class EmbeddingModelSingleton:
-    """Singleton pour le modèle d'embeddings Azure OpenAI"""    
+    """Singleton pour le modèle d'embeddings Azure OpenAI"""
     _instance = None
     def __new__(cls):
         """Crée une nouvelle instance si elle n'existe pas encore"""

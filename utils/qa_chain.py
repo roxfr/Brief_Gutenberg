@@ -1,46 +1,57 @@
-from langchain.prompts import PromptTemplate
-from langchain_core.runnables import RunnableSequence
-from langchain.schema.runnable import RunnablePassthrough
+import logging
+from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+# from utils.tools import (
+#     get_author_by_title,
+#     get_books_by_author,
+#     get_subject_by_title,
+#     get_characters_by_title,
+#     get_all_text_book_by_title_from_url
+# )
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-# def setup_qa_chain(llm, vector_store) -> RunnableSequence:
-#     """Mise en place de la chaîne QA."""
-#     template = """
-#         **Contexte** : Vous êtes un expert en littérature, spécialisé dans les œuvres du Projet Gutenberg.
-#         **Instructions** :
-#         - Répondez uniquement avec des informations vérifiées provenant de ces textes.
-#         - Si vous ne trouvez pas l'information, répondez uniquement par "Je ne sais pas."
-#         - Utilisez le magasin de vecteurs (chromadb) pour vous aider dans vos réponses.
-#         - Évitez de faire des suppositions ou des interprétations personnelles.
-#         **Format** : Fournissez des réponses concises et directes.
-#         **Outils disponibles** : {tools}
-#         **Question** : '{question}'.
-#     """
+# tools = {
+#     "get_author_by_title": {"description": "Finds the author of a book by its title.", "function": get_author_by_title},
+#     "get_books_by_author": {"description": "Retrieves books written by a specific author.", "function": get_books_by_author},
+#     "get_subject_by_title": {"description": "Returns the subject of a book by its title.", "function": get_subject_by_title},
+#     "get_characters_by_title": {"description": "Extracts the characters of a book by its title.", "function": get_characters_by_title},
+#     "get_all_text_book_by_title_from_url": {"description": "Retrieves the complete text of a book online by its title.", "function": get_all_text_book_by_title_from_url},
+# }
 
-def setup_qa_chain(llm, vector_store) -> RunnableSequence:
-    """Set up the QA chain."""
+def setup_qa_chain(llm, vector_store):
     template = """
-        **Context**: You are a literature expert, specializing in the works of the Gutenberg Project.
-        **Instructions**:
-        - Respond only with verified information from these texts.
-        - If you cannot find the information, respond only with "I don't know."
-        - Use the vector store (chromadb) to assist in your answers.
-        - Avoid making assumptions or personal interpretations.
-        **Format**: Provide concise and direct answers.
-        **Available Tools**: {tools}
-        **Question**: '{question}'.
+    You are an intelligent assistant specialized in literature, particularly books from Project Gutenberg.
+    You have the following tools available to answer questions:
+    - get_author_by_title: Finds the author of a book by its title.
+    - get_books_by_author: Retrieves books written by a specific author.
+    - get_subject_by_title: Returns the subject of a book by its title.
+    - get_characters_by_title: Extracts the characters of a book by its title.
+    - get_all_text_book_by_title_from_url: Retrieves the complete text of a book online by its title.
+    
+    Please respond to the following question using the appropriate tool.
+    **Context**: {context}
+    **Question**: {question}
+    **Answer**: Only provide the final answer, no additional steps or code.
     """
 
-    prompt = PromptTemplate(template=template, input_variables=["question", "tools"])
-    retriever = vector_store.as_retriever(k=5)
-    qa_chain = RunnableSequence(
-        {
-            "context": retriever, 
-            "question": RunnablePassthrough(),
-            "tools": RunnablePassthrough()
-        }
+    prompt = PromptTemplate(template=template, input_variables=["context", "question"])
+
+    retriever = vector_store.as_retriever(k=1)
+
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    context_runnable = retriever | RunnableLambda(format_docs)
+    question_runnable = RunnablePassthrough()
+
+    rag_chain = (
+        {"context": context_runnable, "question": question_runnable}
         | prompt
         | llm
-        | RunnablePassthrough()
+        | StrOutputParser()
     )
-    return qa_chain
+
+    return rag_chain

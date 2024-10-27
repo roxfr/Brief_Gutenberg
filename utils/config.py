@@ -8,7 +8,7 @@ def load_config():
         "CSV_CLEANED_PATH": os.path.join("data", "gutenberg_cleaned.csv"),
         "CHROMA_PATH": os.path.join("data", "chroma_langchain_db"),
         "EMBEDDINGS_MODEL": "all-MiniLM-L6-v2",
-        "MODEL_PATH": os.path.join("models", "llama-3.2-3B-Instruct-Q8_0.gguf"),
+        "MODEL_PATH": os.path.join(r"c:\Users\Thierry\Documents\models", "llama-3.2-8B-Instruct-agent-003-128k-code-DPO.i1-Q6_K.gguf"),
         "AZURE_OPENAI_API_KEY": os.getenv("AZURE_OPENAI_API_KEY"),
         "AZURE_OPENAI_API_BASE": os.getenv("AZURE_OPENAI_API_BASE"), 
         "AZURE_OPENAI_API_ENDPOINT": os.getenv("AZURE_OPENAI_API_ENDPOINT"),

@@ -1,6 +1,7 @@
 from langchain_openai import AzureChatOpenAI
 from utils.config import load_config
 
+
 config = load_config()
 AZURE_OPENAI_API_ENDPOINT = config["AZURE_OPENAI_API_ENDPOINT"]
 AZURE_DEPLOYMENT_NAME = config["AZURE_DEPLOYMENT_NAME"]
