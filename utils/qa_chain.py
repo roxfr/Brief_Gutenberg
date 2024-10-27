@@ -24,14 +24,16 @@ logger = logging.getLogger(__name__)
 def setup_qa_chain(llm, vector_store):
     template = """
     You are an intelligent assistant specialized in literature, particularly books from Project Gutenberg.
-    You have the following tools available to answer questions:
-    - get_author_by_title: Finds the author of a book by its title.
-    - get_books_by_author: Retrieves books written by a specific author.
-    - get_subject_by_title: Returns the subject of a book by its title.
-    - get_characters_by_title: Extracts the characters of a book by its title.
-    - get_all_text_book_by_title_from_url: Retrieves the complete text of a book online by its title.
-    
+
+    You have the following tools available to answer questions:    
+    - **get_books_by_author**: Retrieves books written by a specific author.
+    - **get_author_by_title**: Finds the author of a book by its title.
+    - **get_subject_by_title**: Returns the subject of a book by its title.
+    - **get_characters_by_title**: Extracts the characters of a book by its title.
+    - **get_all_text_book_by_title_from_url**: Retrieves the complete text of a book online by its title.
+
     Please respond to the following question using the appropriate tool.
+
     **Context**: {context}
     **Question**: {question}
     **Answer**: Only provide the final answer, no additional steps or code.

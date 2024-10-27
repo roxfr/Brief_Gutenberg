@@ -67,6 +67,7 @@ def test_vector_store(vector_store: Chroma):
         print(f"Texte du livre (EBook-No {ebook_no}):\n{text}")
 
         # Test de la récupération de texte complet par titre
+        title = "moby-dick whale"
         full_text = get_all_text_book_by_title_from_url(vector_store, title)
         print(f"Texte complet de '{title}':\n{full_text}")
 

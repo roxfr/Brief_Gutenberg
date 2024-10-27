@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 from langchain_chroma import Chroma
 import spacy
-from models.embedding_wrapper import EmbeddingWrapperSingleton
+
 
 nlp = spacy.load("en_core_web_sm")
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +34,7 @@ def load_csv(file_path: str) -> pd.DataFrame:
         logging.error(f"Erreur lors du chargement du fichier CSV : {e}")
         raise
 
-def search_in_vector_store(vector_store: Chroma, query: str, k: int = 3, filter=None):
+def search_in_vector_store(vector_store: Chroma, query: str, k: int = 1, filter=None):
     """Effectue une recherche dans le magasin de vecteurs"""
     try:
         results = vector_store.similarity_search(query, k=k, filter=filter)
