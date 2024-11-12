@@ -1,5 +1,5 @@
 import logging
-from models.model import create_llama, create_vector_store
+from models_llm.model import create_llama, create_vector_store
 from utils.qa_chain import setup_qa_chain
 from utils.tools import load_csv
 from utils.config import load_config

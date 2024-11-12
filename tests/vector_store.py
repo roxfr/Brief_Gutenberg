@@ -2,7 +2,7 @@ import os
 import logging
 import pandas as pd
 from langchain_chroma import Chroma
-from models.model import create_vector_store
+from models_llm.model import create_vector_store
 from utils.tools import (
 	get_books_by_author,
 	get_author_by_title,

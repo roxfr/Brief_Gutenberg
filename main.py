@@ -3,7 +3,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 from utils.tools import load_csv
-from models.model import create_llama, create_vector_store
+from models_llm.model import create_llama, create_vector_store
 from utils.config import load_config
 from utils.qa_chain import setup_qa_chain
 from utils.tools import (

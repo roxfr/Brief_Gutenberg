@@ -4,7 +4,7 @@ import uuid
 from langchain_community.llms import LlamaCpp
 from langchain_chroma import Chroma
 from chromadb import PersistentClient, Settings
-from models.embedding_wrapper import EmbeddingWrapperSingleton
+from models_llm.embedding_wrapper import EmbeddingWrapperSingleton
 
 
 DEFAULT_N_GPU_LAYERS = -1  # Nombre de couches
